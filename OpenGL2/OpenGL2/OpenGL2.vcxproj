@@ -142,6 +142,8 @@
     <None Include="assimp-vc140-mt.dll" />
     <None Include="ikpMP3.dll" />
     <None Include="irrKlang.dll" />
+    <None Include="src\cubemaps.fs" />
+    <None Include="src\cubemaps.vs" />
     <None Include="src\lighting_maps.fs" />
     <None Include="src\lighting_maps.vs" />
     <None Include="src\light_casters.fs" />
@@ -154,6 +156,8 @@
     <None Include="src\model_loading.vs" />
     <None Include="src\multiple_lights.fs" />
     <None Include="src\multiple_lights.vs" />
+    <None Include="src\skybox.fs" />
+    <None Include="src\skybox.vs" />
     <None Include="src\texture.fs" />
     <None Include="src\texture.vs" />
   </ItemGroup>
@@ -166,6 +170,11 @@
   <ItemGroup>
     <ClCompile Include="..\Dependencies\GLFW\src\glad.c" />
     <ClCompile Include="src\Application.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Dependencies\GLFW\include\camera.h" />
+    <ClInclude Include="..\Dependencies\GLFW\include\model.h" />
+    <ClInclude Include="..\Dependencies\GLFW\include\shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

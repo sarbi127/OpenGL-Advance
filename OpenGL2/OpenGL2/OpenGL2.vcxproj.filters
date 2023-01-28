@@ -32,6 +32,10 @@
     <None Include="src\multiple_lights.vs" />
     <None Include="src\texture.fs" />
     <None Include="src\texture.vs" />
+    <None Include="src\cubemaps.fs" />
+    <None Include="src\cubemaps.vs" />
+    <None Include="src\skybox.fs" />
+    <None Include="src\skybox.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="awesomeface.png">
@@ -54,5 +58,16 @@
     <ClCompile Include="..\Dependencies\GLFW\src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Dependencies\GLFW\include\camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\GLFW\include\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\GLFW\include\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
