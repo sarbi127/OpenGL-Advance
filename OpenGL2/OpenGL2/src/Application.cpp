@@ -27,7 +27,7 @@ const unsigned int SCR_WIDTH = 1500;
 const unsigned int SCR_HEIGHT = 800;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 5.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -78,12 +78,17 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     // build and compile shaders
-    //Shader shader("C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/model_loading.vs", "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/model_loading.fs");
-    Shader shader("C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/cubemaps.vs", "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/cubemaps.fs");
+    Shader shader_texture("C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/framebuffers.vs", "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/framebuffers.fs");
+    Shader shader_reflection("C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/cubemaps.vs", "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/cubemaps.fs");
+    Shader shader_refrection("C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/cubemaps.vs", "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/cubemaps.fs");
     Shader skyboxShader("C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/skybox.vs", "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/src/skybox.fs");
 
     // load models
-    Model ourModel("C:/Doc/objects/cyborg/cyborg.obj");
+    Model cyborgModel("C:/Doc/objects/cyborg/cyborg.obj");
+    Model planetModel("C:/Doc/objects/planet/planet.obj");
+    Model rockModel("C:/Doc/objects/rock/rock.obj");
+    Model nanosuitModel("C:/Doc/objects/nanosuit/nanosuit.obj");
+    Model girlModel("C:/Doc/objects/14-girl-obj/girl OBJ.obj");
 
 
     // draw in wireframe
@@ -134,6 +139,8 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
+
+
     float skyboxVertices[] = {
         // positions          
         -1.0f,  1.0f, -1.0f,
@@ -190,6 +197,7 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
     // skybox VAO
     unsigned int skyboxVAO, skyboxVBO;
     glGenVertexArrays(1, &skyboxVAO);
@@ -202,12 +210,12 @@ int main()
 
     // load textures
     // -------------
-    unsigned int cubeTexture = loadTexture("C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/container.jpg");
+    //unsigned int cubeTexture = loadTexture("C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/container.jpg");
 
 
     // load textures
     // -------------
-    vector<std::string> faces
+    /*vector<std::string> faces
     {
         "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/skybox/right.jpg",
         "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/skybox/left.jpg",
@@ -215,19 +223,30 @@ int main()
         "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/skybox/bottom.jpg",
         "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/skybox/front.jpg",
         "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/skybox/back.jpg",
+    };*/
+
+    vector<std::string> faces
+    {
+        "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/Tenerife/posx.jpg",
+        "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/Tenerife/negx.jpg",
+        "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/Tenerife/posy.jpg",
+        "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/Tenerife/negy.jpg",
+        "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/Tenerife/posz.jpg",
+        "C:/Doc/OpenGL_NEW/OpenGL-Advance/OpenGL2/OpenGL2/skybox/Tenerife/negz.jpg",
     };
     unsigned int cubemapTexture = loadCubemap(faces);
 
     // shader configuration
     // --------------------
-    shader.use();
-    shader.setInt("texture1", 0);
+    shader_reflection.use();
+    shader_reflection.setInt("texture1", 0);
 
-    //shader.use();
-    //shader.setInt("skybox", 0);
+    shader_texture.use();
+    shader_texture.setInt("texture2", 0);
 
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
+
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -241,45 +260,74 @@ int main()
         processInput(window);
 
         // render
+          // ------
+        // bind to framebuffer and draw scene as we normally would to color texture 
+        //glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        //glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
+
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw scene as normal
-        shader.use();
+        shader_reflection.use();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         //glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 
         //model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        //model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+        view = glm::translate(view, glm::vec3(0.0f, -2.0f, -3.0f));
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         //shader.setMat4("model", model);
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-        shader.setVec3("cameraPos", camera.Position);
-    
+        shader_reflection.setMat4("view", view);
+        shader_reflection.setMat4("projection", projection);
+        shader_reflection.setVec3("cameraPos", camera.Position);
 
-        // cubes
-        //glBindVertexArray(cubeVAO);
+        // render the loaded models
+
+        //cube
+        glBindVertexArray(cubeVAO);
         //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glBindTexture(GL_TEXTURE_2D, cubeTexture);
+        model = glm::translate(model, glm::vec3(-30.0f, 2.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(7.0f, 7.0f, 7.0f));
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+        shader_reflection.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         //glBindVertexArray(0);
-
-        // render the loaded model
-        //glm::mat4 model2 = glm::mat4(1.0f);
+        
+        //rock
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(30.0f, 2.0f, 10.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(2.0f, 2.0f, 2.0f));
+        shader_reflection.setMat4("model", model);
+        rockModel.Draw(shader_reflection);
+        
+        //girl
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -5.0f, 100.0f));
+        model = glm::scale(model, glm::vec3(35.0f, 35.0f, 35.0f));
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, -5.0f, 0.0f));
+        shader_reflection.setMat4("model", model);
+        girlModel.Draw(shader_reflection);
+        
+        //nanosuit
+        model = glm::mat4(1.0f);
+        //glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        shader.setMat4("model", model);
-        ourModel.Draw(shader);
+        model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));	// it's a bit too big for our scene, so scale it down
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+        shader_reflection.setMat4("model", model);
+        nanosuitModel.Draw(shader_reflection);
 
 
         // draw skybox as last
-        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content 1.0
         skyboxShader.use();
         view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+        //view = glm::mat3(camera.GetViewMatrix());
         skyboxShader.setMat4("view", view);
         skyboxShader.setMat4("projection", projection);
 

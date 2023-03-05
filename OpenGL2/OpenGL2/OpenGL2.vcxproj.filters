@@ -36,6 +36,10 @@
     <None Include="src\cubemaps.vs" />
     <None Include="src\skybox.fs" />
     <None Include="src\skybox.vs" />
+    <None Include="framebuffers.vs" />
+    <None Include="framebuffers.fs" />
+    <None Include="coordinate_systems.vs" />
+    <None Include="coordinate_systems.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="awesomeface.png">

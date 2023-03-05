@@ -140,6 +140,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="assimp-vc140-mt.dll" />
+    <None Include="coordinate_systems.fs" />
+    <None Include="coordinate_systems.vs" />
+    <None Include="framebuffers.fs" />
+    <None Include="framebuffers.vs" />
     <None Include="ikpMP3.dll" />
     <None Include="irrKlang.dll" />
     <None Include="src\cubemaps.fs" />
