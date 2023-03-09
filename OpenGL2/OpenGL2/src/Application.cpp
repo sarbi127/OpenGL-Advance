@@ -307,7 +307,7 @@ int main()
         
         //girl
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -5.0f, 100.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 70.0f));
         model = glm::scale(model, glm::vec3(35.0f, 35.0f, 35.0f));
         model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, -5.0f, 0.0f));
         shader_reflection.setMat4("model", model);
